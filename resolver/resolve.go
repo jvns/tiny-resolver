@@ -1,14 +1,10 @@
-package main
+package resolver
 
 import (
 	"errors"
-	"flag"
 	"fmt"
 	"net"
-	"os"
-	"strings"
 
-	"github.com/jvns/resolve/logger"
 	"github.com/miekg/dns"
 	"go.uber.org/zap"
 )
@@ -150,42 +146,4 @@ func (r *Resolver) dnsQuery(name string, server net.IP) *dns.Msg {
 	reply, _, _ := c.Exchange(msg, server.String()+":53")
 
 	return reply
-}
-
-func main() {
-	var (
-		target     *string
-		nameserver *string
-	)
-
-	target = flag.String("target", "", "desired record for resolving")
-	nameserver = flag.String("nameserver", "", "desired nameserver used for resolving")
-
-	flag.Parse()
-
-	if *target == "" {
-		logger.Log.Error("Target is required")
-		os.Exit(1)
-	}
-
-	if !strings.HasSuffix(*target, ".") {
-		*target = *target + "."
-	}
-
-	log := logger.Log.WithOptions(zap.Fields(
-		zap.String("target", *target),
-	))
-
-	r := New(nameserver, nil, log)
-	ip, err := r.Resolve(*target)
-
-	if err != nil {
-		log.Error("Error in resolving",
-			zap.Error(err),
-		)
-	} else {
-		log.Info("Got result",
-			zap.String("ip", ip.String()),
-		)
-	}
 }
