@@ -17,6 +17,8 @@ func resolve(name string) net.IP {
 		if ip := getAnswer(reply); ip != nil {
 			// Best case: we get an answer to our query and we're done
 			return ip
+		} else if target := getCNAME(reply); target != "" {
+			return resolve(target)
 		} else if nsIP := getGlue(reply); nsIP != nil {
 			// Second best: we get a "glue record" with the *IP address* of another nameserver to query
 			nameserver = nsIP
@@ -49,6 +51,16 @@ func getGlue(reply *dns.Msg) net.IP {
 		}
 	}
 	return nil
+}
+
+func getCNAME(reply *dns.Msg) string {
+	for _, record := range reply.Answer {
+		if record.Header().Rrtype == dns.TypeCNAME {
+			fmt.Println("  ", record)
+			return record.(*dns.CNAME).Target
+		}
+	}
+	return ""
 }
 
 func getNS(reply *dns.Msg) string {
