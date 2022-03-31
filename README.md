@@ -17,11 +17,17 @@ The go version:
 go run resolve.go example.com.
 ```
 
+The Python version
+
+```
+pip install dnspython
+python3 resolve.py example.com
+```
+
 ### other versions
 
 * Rust: https://github.com/kmkaplan/tiny-resolver-rs
 * Elixir: https://www.bortzmeyer.org/files/tiny-resolver.tar
-* Python: https://www.bortzmeyer.org/files/tiny-resolver.py
 
 ### blog post
 
